@@ -1,15 +1,35 @@
-# Compilar
+# Descargar repositorio
 
-Para compilar con un compilador específico, abrir una terminal en la carpeta del repositorio y ejecutar:
+En una terminal (como la de VSCode), dirigirse a la carpeta donde se quiera descargar el repositorio y ejecutar:
 
-`CC=gcc make all`
+```bash
+git clone https://github.com/matias-bulacio/SnakeGame.git
+```
 
-Reemplace gcc por su compilador de preferencia
+# Configurar creación
 
-Puede compilar para Windows con:
+Para cada posible plataforma de destino, debe modificar su compilador en el Makefile
 
-`make windows`
+En las primeras líneas del Makefile, encontrará las siguientes variables.
 
-Y para linux con
+```Makefile
+LINUX_CC=gcc
+WINDOWS_CC=x86_64-w64-mingw32-gcc
+WEB_CC=/usr/lib/emscripten/emcc
+```
 
-`make linux`
+Si su compilador para la plataforma correspondiente es diferente al especificado después del igual, modifíquelo.
+Si alguna variable esté vacía, no podrá compilar para esa plataforma en su máquina.
+
+Para compilar para una plataforma, ejecutar `make PLATAFORMA`
+
+Por ejemplo:
+```bash
+make linux
+make windows
+make web
+```
+
+> [!NOTE]
+> Solo si se tiene la variable para la plataforma correspondiente definida se debe compilar
+

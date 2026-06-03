@@ -1,7 +1,10 @@
 LINUX_CC=gcc
 WINDOWS_CC=x86_64-w64-mingw32-gcc
-WEB_CC=
+WEB_CC=/usr/lib/emscripten/emcc
 CFLAGS=-O2 -Wall -Wextra -MMD -MP
+CFLAGS_LINUX=
+CFLAGS_WINDOWS=
+CFLAGS_WEB=--memory-init-file 0 -s USE_GLFW=3 --shell-file=Libraries/Static/Web/minshell.html -s MAX_WEBGL_VERSION=2
 
 SOURCES=$(wildcard Source/*.c Source/Implementation/*.c)
 OBJECTS_LINUX=$(patsubst %.c,Build/Linux/%.o,$(SOURCES))
@@ -28,21 +31,28 @@ WINDOWS_LIBS= -LLibraries/Static/Windows/ -Wl,-Bstatic $(STATIC_WINDOWS_LIBS) -W
 
 linux: Binaries/Linux/game
 windows: Binaries/Windows/game.exe
-#web:
+web: Binaries/Web/game.html
 
 Binaries/Linux/game: $(OBJECTS_LINUX)
 	$(LINUX_CC) -o $@ $^ $(LINUX_LIBS)
 
-Build/Linux/%.o: %.c | Build/Linux/
+Build/Linux/%.o: %.c | Build/Linux
 	mkdir -p $(dir $@)
-	$(LINUX_CC) $(CFLAGS) $(COMMON_INCLUDE) $(LINUX_INCLUDE) -c -o $@ $< -MF $(@:.o=.d)
+	$(LINUX_CC) $(CFLAGS) $(CFLAGS_LINUX) $(COMMON_INCLUDE) $(LINUX_INCLUDE) -c -o $@ $< -MF $(@:.o=.d)
 
 Binaries/Windows/game.exe: $(OBJECTS_WINDOWS)
 	$(WINDOWS_CC) -o $@ $^ $(WINDOWS_LIBS)
 
 Build/Windows/%.o: %.c | Build/Windows
 	mkdir -p $(dir $@)
-	$(WINDOWS_CC) $(CFLAGS) $(COMMON_INCLUDE) $(WINDOWS_INCLUDE) -c -o $@ $< -MF $(@:.o=.d)
+	$(WINDOWS_CC) $(CFLAGS) $(CFLAGS_WINDOWS) $(COMMON_INCLUDE) $(WINDOWS_INCLUDE) -c -o $@ $< -MF $(@:.o=.d)
+
+Binaries/Web/game.html: $(OBJECTS_WEB)
+	$(WEB_CC) -o $@ $^ $(WEB_LIBS)
+
+Build/Web/%.o: %.c | Build/Web
+	mkdir -p $(dir $@)
+	$(WEB_CC) $(CFLAGS) $(CFLAGS_WEB) $(COMMON_INCLUDE) $(WEB_INCLUDE) -c -o $@ $< -MF $(@:.o=.d)
 
 Build/Linux Build/Windows Build/Web:
 	mkdir -p $@
