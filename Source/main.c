@@ -1,12 +1,16 @@
 #include <raylib.h>
+#include <shooter.h>
 #include <stdbool.h>
+#include <tetris.h>
 
 #ifdef PLATFORM_WEB
 #include <emscripten/emscripten.h>
 #endif
 
+int escena = 0;
+
 void setup(void) {
-    InitWindow(800, 600, "SnakeGame");
+    InitWindow(800, 600, "TetrisShoot");
 
     // InitAudioDevice();
 
@@ -15,8 +19,14 @@ void setup(void) {
 
 void loop(void) {
     ClearBackground(RAYWHITE);
-	DrawCircle(400, 300, 200, RED);
-	DrawRectangle(100, 200, 100, 200, GREEN);
+    switch (escena) {
+    case 0:
+        escena = tetris();
+        break;
+    case 1:
+        escena = shooter();
+        break;
+    }
 }
 
 void final(void) { CloseWindow(); }
