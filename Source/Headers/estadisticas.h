@@ -2,4 +2,3 @@
 
 extern unsigned int puntos;
 extern int vida;
-

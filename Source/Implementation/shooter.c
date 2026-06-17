@@ -22,8 +22,10 @@ CollisionBox colisiones_bala = (CollisionBox){
     .up = -30,
 };
 
+// SCREEN_WIDTH/2
 int posicion_pistola = 416;
 
+// Una función de setup que se llama la primera vez en cada escena
 int setup_shooter() {
     if (IsTextureValid(texture)) {
         UnloadTexture(texture);
@@ -47,6 +49,7 @@ int setup_shooter() {
         return -1; // Error
     }
 
+    // TODO: Mover estos números mágicos a una configuración
     for (size_t i = 0; i < cantidad_enemigos; i++) {
         Enemigo *e = &arreglo_de_enemigos[i];
         e->coordenadas.y = 0;
@@ -64,12 +67,13 @@ int setup_shooter() {
 
 int shooter(bool setup) {
     float delta = GetFrameTime();
-    if (setup) { // Setting up
+    if (setup) {
         int r = setup_shooter();
         if (r != 0)
             return r;
     }
 
+    // Input y cálculo
     int movimiento_pistola = delta * 400 *
                              ((IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) -
                               (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)));
@@ -101,6 +105,8 @@ int shooter(bool setup) {
         }
     }
 
+    // Dibujado
+
     ClearBackground(BEIGE);
 
     DrawRectangle(0, 500, 832, 20, ColorAlpha(WHITE, 0.8));
@@ -108,7 +114,9 @@ int shooter(bool setup) {
     Enemigo_DibujarVarios(arreglo_de_enemigos, cantidad_enemigos);
 
     char buf[200];
-    sprintf(buf, "Vida: %u", puntos);
+    sprintf(
+        buf, "Vida: %u",
+        vida); // Sin implementación aún, se necesita una pantalla de pérdida.
 
     if (mostrar_bala)
         DrawRectangle(coordenadas_bala.x + colisiones_bala.left,

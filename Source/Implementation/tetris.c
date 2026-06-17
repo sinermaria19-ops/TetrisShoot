@@ -2,6 +2,5 @@
 #include <tetris.h>
 
 int tetris(bool setup) {
-    DrawRectangle(100, 100, 400, 400, BLUE);
     return 0;
 }

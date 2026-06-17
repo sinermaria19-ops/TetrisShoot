@@ -1,11 +1,11 @@
 #pragma once
 
-#include <raylib.h>
 #include <collision.h>
+#include <raylib.h>
 #include <stddef.h>
 typedef struct {
     Vector2 coordenadas;
-	CollisionBox colisiones;
+    CollisionBox colisiones;
     Texture2D *textura;
 } Enemigo;
 
