@@ -1,7 +1,6 @@
 #include <raylib.h>
 #include <tetris.h>
 
-int tetris(void) {
-    DrawRectangle(100, 100, 400, 400, BLUE);
+int tetris(bool setup) {
     return 0;
 }
