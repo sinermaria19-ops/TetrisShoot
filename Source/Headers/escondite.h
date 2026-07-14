@@ -1,10 +1,10 @@
 #pragma once
 #include <collision.h>
+#include <dibujo.h>
 #include <raylib.h>
 
 typedef struct {
-    Texture texture;
     CollisionBox collision;
     Vector2 coordinates;
-    Vector2 texture_offset;
+    Dibujo *dib;
 } Escondite;

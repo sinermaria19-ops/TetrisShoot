@@ -10,14 +10,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Image image_escondite;
-Image image_pistola;
-Image image_bala;
-Image image_enemigo;
-Texture2D textura_escondite;
-Texture2D textura_pistola;
-Texture2D textura_bala;
-Texture2D textura_enemigo;
+Dibujo dib_enemigo;
+Dibujo dib_escondite;
+Dibujo dib_pistola;
+Dibujo dib_bala;
 
 Enemigo *arreglo_de_enemigos;
 size_t cantidad_enemigos = 5;
@@ -34,40 +30,35 @@ CollisionBox colisiones_bala = (CollisionBox){
 };
 
 // SCREEN_WIDTH/2
-int posicion_pistola = 416;
+Vector2 coord_pistola = {
+    .x = 416,
+    .y = 550,
+};
 
 // Una función de setup que se llama la primera vez en cada escena
 int setup_shooter() {
-    if (IsTextureValid(textura_pistola)) {
-        UnloadTexture(textura_pistola);
+    if (IsTextureValid(dib_pistola.textura)) {
+        UnloadTexture(dib_pistola.textura);
     }
-    if (IsImageValid(image_pistola)) {
-        UnloadImage(image_pistola);
-    }
-    image_pistola = Resources_LoadImage("Resources/Shooter/pistol.png");
+    Image image_pistola = Resources_LoadImage("Resources/Shooter/pistol.png");
     ImageResizeNN(&image_pistola, 45, 180);
-    textura_pistola = LoadTextureFromImage(image_pistola);
+    dib_pistola = LoadDibujoFromCenteredImage(image_pistola);
 
-    if (IsTextureValid(textura_bala)) {
-        UnloadTexture(textura_bala);
+    if (IsTextureValid(dib_bala.textura)) {
+        UnloadTexture(dib_bala.textura);
     }
-    if (IsImageValid(image_bala)) {
-        UnloadImage(image_bala);
-    }
-    image_bala = Resources_LoadImage("Resources/Shooter/bala.png");
+    Image image_bala = Resources_LoadImage("Resources/Shooter/bala.png");
     ImageResizeNN(&image_bala, colisiones_bala.right - colisiones_bala.left,
                   colisiones_bala.down - colisiones_bala.up);
-    textura_bala = LoadTextureFromImage(image_bala);
+    dib_bala = LoadDibujoFromCenteredImage(image_bala);
 
-    if (IsTextureValid(textura_enemigo)) {
-        UnloadTexture(textura_enemigo);
+    if (IsTextureValid(dib_enemigo.textura)) {
+        UnloadTexture(dib_enemigo.textura);
     }
-    if (IsImageValid(image_enemigo)) {
-        UnloadImage(image_enemigo);
-    }
-    image_enemigo = Resources_LoadImage("Resources/Animals/tiger.png");
+
+    Image image_enemigo = Resources_LoadImage("Resources/Animals/tiger.png");
     ImageResizeNN(&image_enemigo, 128, 128);
-    textura_enemigo = LoadTextureFromImage(image_enemigo);
+    dib_enemigo = LoadDibujoFromCenteredImage(image_enemigo);
 
     if (arreglo_de_enemigos == NULL)
         free(arreglo_de_enemigos);
@@ -85,20 +76,16 @@ int setup_shooter() {
         Enemigo *e = &arreglo_de_enemigos[i];
         e->coordenadas.y = 0;
         e->coordenadas.x = 64 + 176 * i;
-        e->textura = &textura_enemigo;
         e->colisiones = (CollisionBox){
             .left = -20,
             .right = 20,
             .up = -50,
             .down = 50,
         };
-        e->offset_textura = (Vector2){
-            .x = -64,
-            .y = -64,
-        };
+        e->dib = &dib_enemigo;
     }
-    image_escondite = GenImageColor(100, 20, BROWN);
-    textura_escondite = LoadTextureFromImage(image_escondite);
+    Image image_escondite = GenImageColor(100, 20, BROWN);
+    dib_escondite = LoadDibujoFromCenteredImage(image_escondite);
 
     le = NewListaEscondites(5);
     for (size_t i = 0; i < le.cantidad; i++) {
@@ -112,8 +99,7 @@ int setup_shooter() {
             .y = 30 + 60 * i,
             .x = 50 + 100 * i,
         };
-        le.arr[i].texture = textura_escondite;
-        le.arr[i].texture_offset = (Vector2){-50, -10};
+        le.arr[i].dib = &dib_escondite;
     }
     return 0;
 }
@@ -131,7 +117,7 @@ int shooter(bool setup) {
                              ((IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) -
                               (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)));
 
-    posicion_pistola += movimiento_pistola;
+    coord_pistola.x += movimiento_pistola;
     if (mostrar_bala) {
         coordenadas_bala.y -= 1600 * delta;
     }
@@ -139,7 +125,7 @@ int shooter(bool setup) {
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W) ||
         IsKeyPressed(KEY_SPACE)) {
         mostrar_bala = true;
-        coordenadas_bala.x = posicion_pistola;
+        coordenadas_bala.x = coord_pistola.x;
         coordenadas_bala.y = 520;
     }
 
@@ -179,14 +165,10 @@ int shooter(bool setup) {
         vida); // Sin implementación aún, se necesita una pantalla de pérdida.
 
     if (mostrar_bala)
-        DrawTexture(textura_bala, coordenadas_bala.x + colisiones_bala.left,
-                    coordenadas_bala.y + colisiones_bala.up, WHITE);
-    DrawTexture(textura_pistola, posicion_pistola - 20, 450, WHITE);
+        Dibujar(&dib_bala, coordenadas_bala);
+    Dibujar(&dib_pistola, coord_pistola);
     for (size_t i = 0; i < le.cantidad; i++) {
-        DrawTexture(le.arr[i].texture,
-                    le.arr[i].texture_offset.x + le.arr[i].coordinates.x,
-                    le.arr[i].texture_offset.y + le.arr[i].coordinates.y,
-                    WHITE);
+        Dibujar(le.arr[i].dib, le.arr[i].coordinates);
     }
     DrawText(buf, 20, 20, 24, BLACK);
     return 1;
