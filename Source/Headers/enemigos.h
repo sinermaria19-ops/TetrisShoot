@@ -7,6 +7,7 @@ typedef struct {
     Vector2 coordenadas;
     CollisionBox colisiones;
     Texture2D *textura;
+    Vector2 offset_textura;
 } Enemigo;
 
 void Enemigo_Avanzar(Enemigo *e, int velocidad, float frame_time);

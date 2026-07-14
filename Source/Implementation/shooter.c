@@ -1,23 +1,28 @@
 #include <collision.h>
 #include <enemigos.h>
 #include <estadisticas.h>
+#include <lista_escondites.h>
 #include <raylib.h>
+#include <resources.h>
 #include <shooter.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <resources.h>
 #include <stdlib.h>
 
+Image image_escondite;
 Image image_pistola;
 Image image_bala;
 Image image_enemigo;
+Texture2D textura_escondite;
 Texture2D textura_pistola;
 Texture2D textura_bala;
 Texture2D textura_enemigo;
 
 Enemigo *arreglo_de_enemigos;
 size_t cantidad_enemigos = 5;
+
+ListaEscondites le;
 
 Vector2 coordenadas_bala = {0, -100};
 bool mostrar_bala = false;
@@ -87,6 +92,28 @@ int setup_shooter() {
             .up = -50,
             .down = 50,
         };
+        e->offset_textura = (Vector2){
+            .x = -64,
+            .y = -64,
+        };
+    }
+    image_escondite = GenImageColor(100, 20, BROWN);
+    textura_escondite = LoadTextureFromImage(image_escondite);
+
+    le = NewListaEscondites(5);
+    for (size_t i = 0; i < le.cantidad; i++) {
+        le.arr[i].collision = (CollisionBox){
+            .up = -5,
+            .down = 5,
+            .left = -40,
+            .right = 40,
+        };
+        le.arr[i].coordinates = (Vector2){
+            .y = 30 + 60 * i,
+            .x = 50 + 100 * i,
+        };
+        le.arr[i].texture = textura_escondite;
+        le.arr[i].texture_offset = (Vector2){-50, -10};
     }
     return 0;
 }
@@ -130,6 +157,13 @@ int shooter(bool setup) {
             }
         }
     }
+    for (size_t i = 0; i < le.cantidad; i++) {
+        if (mostrar_bala &&
+            DetectCollision(le.arr[i].collision, colisiones_bala,
+                            le.arr[i].coordinates, coordenadas_bala)) {
+            mostrar_bala = false;
+        }
+    }
 
     // Dibujado
 
@@ -148,6 +182,12 @@ int shooter(bool setup) {
         DrawTexture(textura_bala, coordenadas_bala.x + colisiones_bala.left,
                     coordenadas_bala.y + colisiones_bala.up, WHITE);
     DrawTexture(textura_pistola, posicion_pistola - 20, 450, WHITE);
+    for (size_t i = 0; i < le.cantidad; i++) {
+        DrawTexture(le.arr[i].texture,
+                    le.arr[i].texture_offset.x + le.arr[i].coordinates.x,
+                    le.arr[i].texture_offset.y + le.arr[i].coordinates.y,
+                    WHITE);
+    }
     DrawText(buf, 20, 20, 24, BLACK);
     return 1;
 }
