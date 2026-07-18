@@ -1,5 +1,7 @@
 #include <enemigos.h>
+#include <escape.h>
 #include <raymath.h>
+#include <screen.h>
 #include <stddef.h>
 
 void Enemigo_Update(Enemigo *e, float now, float frame_time) {
@@ -48,15 +50,27 @@ void Enemigo_Update(Enemigo *e, float now, float frame_time) {
     case ENEM_STATE_ESCONDIDO:
         if (now > e->esperar_hasta) {
             Escondite *esc = SiguienteEscondite(e->le, e->coordenadas);
-            if (esc == NULL)
+            if (esc) {
+                e->esc->ocupado = false;
+                e->esc = esc;
+                e->objetivo =
+                    Vector2Add(e->esc->zona_escondida, e->esc->coordinates);
+                e->esc->ocupado = true;
+                e->estado = ENEM_STATE_CORRIENDO_X;
                 break;
+            }
 
-            e->esc->ocupado = false;
-            e->esc = esc;
-            e->objetivo =
-                Vector2Add(e->esc->zona_escondida, e->esc->coordinates);
-            e->esc->ocupado = true;
-            e->estado = ENEM_STATE_CORRIENDO_X;
+            Escape *exit = MejorEscape(e->lexits, e->coordenadas.x);
+            if (exit) {
+                e->esc->ocupado = false;
+                e->esc = NULL;
+                e->objetivo = (Vector2){
+                    .x = exit->x,
+                    .y = SCREEN_SHOOTER_HEIGHT + 200,
+                };
+                e->estado = ENEM_STATE_CORRIENDO_X;
+                break;
+            }
         }
         break;
     case ENEM_STATE_OUT:
@@ -67,5 +81,6 @@ void Enemigo_Update(Enemigo *e, float now, float frame_time) {
 void Enemigo_Reset(Enemigo *e) {
     e->estado = ENEM_STATE_INACTIVO;
     e->coordenadas.y = -100;
-    e->esc->ocupado = false;
+    if (e->esc)
+        e->esc->ocupado = false;
 }

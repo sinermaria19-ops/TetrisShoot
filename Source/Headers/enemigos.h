@@ -2,6 +2,7 @@
 
 #include <collision.h>
 #include <dibujo.h>
+#include <escape.h>
 #include <escondite.h>
 #include <lista_escondites.h>
 #include <raylib.h>
@@ -25,6 +26,7 @@ typedef struct {
     Dibujo *dib;
     Escondite *esc;
     ListaEscondites *le;
+    ListaEscapes *lexits;
 } Enemigo;
 
 void Enemigo_Update(Enemigo *e, float now, float frame_time);

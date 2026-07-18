@@ -1,5 +1,6 @@
 #include <collision.h>
 #include <enemigos.h>
+#include <escape.h>
 #include <estadisticas.h>
 #include <lista_enemigos.h>
 #include <lista_escondites.h>
@@ -21,6 +22,7 @@ ListaEnemigos lenem;
 
 ListaEscondites lesc;
 ListaEscondites escondites_ganadores;
+ListaEscapes lexits;
 
 Vector2 coordenadas_bala = {0, -100};
 bool mostrar_bala = false;
@@ -60,11 +62,8 @@ int setup_shooter() {
 
     // Setup escondites
 
-    // Los primeros 5 escondites son escondites reales para los animales, dentro
-    // de la pantalla Los siguientes 5 son falsos, están debajo de la pantalla,
-    // y sirve para que los animales lo usen de objetivo, así intentan pasar la
-    // línea.
-    lesc = NewListaEscondites(10);
+    FreeListaEscondites(&lesc);
+    lesc = NewListaEscondites(5);
     for (size_t i = 0; i < lesc.cantidad; i++) {
         Escondite *esc = lesc.arr + i;
         esc->collision = (CollisionBox){
@@ -78,28 +77,25 @@ int setup_shooter() {
             .x = 0,
             .y = -50,
         };
-    }
-    for (size_t i = 0; i < 5; i++) {
-        Escondite *esc = lesc.arr + i;
         esc->coordinates = (Vector2){
             .x = 380 + 80 * (i % 2 == 0 ? i : -i),
             .y = 120 + 70 * i,
         };
     }
-    for (size_t i = 5; i < 10; i++) {
-        Escondite *esc = lesc.arr + i;
-        esc->coordinates.y = SCREEN_SHOOTER_HEIGHT + 200;
-    }
-    lesc.arr[5].coordinates.x = 60;
-    lesc.arr[6].coordinates.x = 220;
-    lesc.arr[7].coordinates.x = 460;
-    lesc.arr[8].coordinates.x = 620;
-    lesc.arr[9].coordinates.x = 780;
+
+    // Setup escapes
+
+    FreeListaEscapes(&lexits);
+    lexits = NewListaEscapes(5);
+    lexits.arr[0].x = 60;
+    lexits.arr[1].x = 220;
+    lexits.arr[2].x = 460;
+    lexits.arr[3].x = 620;
+    lexits.arr[4].x = 780;
 
     // Setup enemigos
 
-    if (lenem.arr != NULL)
-        MemFree(lenem.arr);
+    FreeListaEnemigos(&lenem);
     lenem = NewListaEnemigos(5);
 
     if (lenem.arr == NULL) {
@@ -118,7 +114,8 @@ int setup_shooter() {
         };
         e->le = &lesc;
         e->dib = &dib_enemigo;
-        e->velocidad = 75;
+        e->velocidad = 120;
+        e->lexits = &lexits;
     }
     return 0;
 }

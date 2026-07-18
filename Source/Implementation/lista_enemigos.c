@@ -7,6 +7,14 @@ ListaEnemigos NewListaEnemigos(size_t n) {
     return lenem;
 }
 
+void FreeListaEnemigos(ListaEnemigos *lenem) {
+    if (!lenem->arr)
+        return;
+
+    MemFree(lenem->arr);
+    lenem->arr = NULL;
+}
+
 void Dibujar_ListaEnemigos(ListaEnemigos *lenem) {
     for (size_t i = 0; i < lenem->n; i++) {
         Enemigo *e = &lenem->arr[i];

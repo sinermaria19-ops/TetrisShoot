@@ -9,6 +9,7 @@ typedef struct {
 
 ListaEscondites NewListaEscondites(size_t cant);
 void FreeListaEscondites(ListaEscondites *le);
+
 Escondite *PrimerEsconditeLibre(ListaEscondites *le);
 Escondite *SiguienteEscondite(ListaEscondites *le, Vector2 coords);
 

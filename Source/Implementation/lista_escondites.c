@@ -9,29 +9,36 @@ ListaEscondites NewListaEscondites(size_t cant) {
     return le;
 }
 
-void FreeListaEscondites(ListaEscondites *le) { MemFree(le->arr); }
+void FreeListaEscondites(ListaEscondites *lesc) {
+    if (!lesc->arr)
+        return;
 
-Escondite *PrimerEsconditeLibre(ListaEscondites *le) {
-    for (size_t i = 0; i < le->cantidad; i++) {
-        if (le->arr[i].ocupado == false)
-            return le->arr + i;
+    MemFree(lesc->arr);
+    lesc->arr = NULL;
+}
+
+Escondite *PrimerEsconditeLibre(ListaEscondites *lesc) {
+    for (size_t i = 0; i < lesc->cantidad; i++) {
+        if (lesc->arr[i].ocupado == false)
+            return lesc->arr + i;
     }
     return NULL;
 }
 
-Escondite *SiguienteEscondite(ListaEscondites *le, Vector2 coords) {
+Escondite *SiguienteEscondite(ListaEscondites *lesc, Vector2 coords) {
     Escondite *esc = NULL;
-    for (size_t i = 0; i < le->cantidad; i++) {
-        if (le->arr[i].zona_escondida.y + le->arr[i].coordinates.y <= coords.y)
+    for (size_t i = 0; i < lesc->cantidad; i++) {
+        if (lesc->arr[i].zona_escondida.y + lesc->arr[i].coordinates.y <=
+            coords.y)
             continue;
-        if (le->arr[i].ocupado)
+        if (lesc->arr[i].ocupado)
             continue;
 
         if (!esc ||
             (fabsf(esc->zona_escondida.x + esc->coordinates.x - coords.x) >
-             fabsf(le->arr[i].zona_escondida.x + le->arr[i].coordinates.x +
+             fabsf(lesc->arr[i].zona_escondida.x + lesc->arr[i].coordinates.x +
                    -coords.x)))
-            esc = le->arr + i;
+            esc = lesc->arr + i;
     }
     return esc;
 }
