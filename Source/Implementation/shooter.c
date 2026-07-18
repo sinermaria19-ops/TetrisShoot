@@ -27,8 +27,8 @@ ListaEscapes lexits;
 Vector2 coordenadas_bala = {0, -100};
 bool mostrar_bala = false;
 CollisionBox colisiones_bala = (CollisionBox){
-    .left = -18,
-    .right = 18,
+    .left = -16,
+    .right = 16,
     .down = 18,
     .up = -18,
 };
@@ -50,10 +50,8 @@ int setup_shooter() {
     dib_pistola =
         Resources_LoadCenteredDibujo("Resources/Shooter/pistol.png", 35, 150);
 
-    dib_bala = Resources_LoadCenteredDibujo(
-        "Resources/Shooter/bala.png",
-        colisiones_bala.right - colisiones_bala.left,
-        colisiones_bala.down - colisiones_bala.up);
+    dib_bala =
+        Resources_LoadCenteredDibujo("Resources/Shooter/bala.png", 40, 45);
     dib_enemigo =
         Resources_LoadCenteredDibujo("Resources/Animals/tiger.png", 96, 96);
 
@@ -114,7 +112,7 @@ int setup_shooter() {
         };
         e->le = &lesc;
         e->dib = &dib_enemigo;
-        e->velocidad = 120;
+        e->velocidad = GetRandomValue(110, 200);
         e->lexits = &lexits;
     }
     return 0;

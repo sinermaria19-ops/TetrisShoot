@@ -8,7 +8,7 @@ void Enemigo_Update(Enemigo *e, float now, float frame_time) {
     Vector2 obj;
     switch (e->estado) {
     case ENEM_STATE_NULL:
-        e->esperar_hasta = now + 6;
+        e->esperar_hasta = now + GetRandomValue(2000, 6000) / 1000.;
         e->estado = ENEM_STATE_INACTIVO;
         break;
     case ENEM_STATE_INACTIVO:
@@ -44,7 +44,7 @@ void Enemigo_Update(Enemigo *e, float now, float frame_time) {
 
         if (Vector2Equals(e->coordenadas, obj)) {
             e->estado = ENEM_STATE_ESCONDIDO;
-            e->esperar_hasta = now + 4;
+            e->esperar_hasta = now + GetRandomValue(250, 3500) / 1000.;
         }
         break;
     case ENEM_STATE_ESCONDIDO:
@@ -83,4 +83,5 @@ void Enemigo_Reset(Enemigo *e) {
     e->coordenadas.y = -100;
     if (e->esc)
         e->esc->ocupado = false;
+    e->velocidad = GetRandomValue(110, 200);
 }
